@@ -1,0 +1,14 @@
+{
+    "name": "RPG",
+    "short_name": "RPG",
+    "start_url": "index.html",
+    "display": "fullscreen",
+    "background_color": "#FF808E",
+    "theme_color": "#fff",
+    "description": "",
+    "icons": [{
+      "src": "TemplateData/icon200.png",
+      "sizes": "200x200",
+      "type": "image/png"
+    }]
+  }
