@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-
+    
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -14,6 +14,19 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
+
+      /* �j��N�����P Canvas �����Ժ���ù�����t�A�L������w����Z */
+      html, body, #unity-container, #unity-canvas {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        overflow: hidden !important;
+      }
+
       /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
@@ -81,7 +94,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.374";
+      var unityVersion = "0.3766";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -94,7 +107,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.374",
+        productVersion: "0.3766",
         showBanner: unityShowBanner,
       };
 
@@ -102,12 +115,13 @@
       // ���������]�p iPhone Retina �ù��^�W���ѪR�״�V�A���� GPU �L���o�S�A�ѨM 10 ���᭰�W�d�y
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
-if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        // ����G�[�J viewport-fit=cover�A���e�����������񺡪��A�C
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        // �֤߭ק� 1: �[�W viewport-fit=cover
+        // �֤߭ק� 2: �[�W minimal-ui�A�æb iPhone �W��ĳ������ 1.0 ��ҡA���� height-device-height ���ɾɭP������
+        meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover, minimal-ui';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
         // =======================================================================
