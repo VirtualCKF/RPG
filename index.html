@@ -20,7 +20,6 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-
       /* �j��N�����P Canvas �����Ժ���ù�����t�A�L������w����Z */
       html, body {
         position: fixed !important;
@@ -28,23 +27,32 @@
         left: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        height: 100dvh !important; /* �ʺA�������סA�|�۰ʭp�J���A�C */
+        height: 100dvh !important;
         overflow: hidden !important;
         margin: 0 !important;
         padding: 0 !important;
+        background-color: #000000 !important; /* �T�O�����̩��h�O�¦�]�λP�A�C�������ۦP���C��^ */
       }
 
-      /* �s�W�G�j�� Unity �e���P�e�������Ժ��A�øɨ����A�C�Q�Y�������� */
-      #unity-container, #unity-canvas {
+      /* �֤߭ץ��G�N��� Unity �e�����W���A��z���A�C�A�åѩ���� */
+      #unity-container {
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        /* ����G�ϥ� 100dvh�]�ʺA���ס^�[�W�w���ϰ���v�A������X�{���� */
-        height: calc(100% + env(safe-area-inset-top)) !important;
-        height: calc(100dvh + env(safe-area-inset-top)) !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        background-color: transparent !important;
+      }
+
+      #unity-canvas {
+        position: absolute !important;
+        /* �j��N�e�����W�Ԧ��A��z�t�Ϊ��A�C�]�ɶ��q�q���@��^ */
+        top: 0 !important; 
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: transparent !important;
       }
 
       /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
@@ -114,7 +122,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.384";
+      var unityVersion = "0.385";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -127,7 +135,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.384",
+        productVersion: "0.385",
         showBanner: unityShowBanner,
       };
 
@@ -138,24 +146,12 @@
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
+        // �[�W viewport-fit=cover ���\��z���A�C
         meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
         container.className = "unity-mobile";
         loadingBar.style.position = "fixed";
-
-        // ²�� JavaScript �ե��G�u�ݽT�O�e���P�e�����˦������浹 CSS �����Y�i
-        function forceFullScreen() {
-          container.style.top = "0px";
-          canvas.style.top = "0px";
-          container.style.height = "calc(100vh + env(safe-area-inset-top))";
-          canvas.style.height = "calc(100vh + env(safe-area-inset-top))";
-        }
-        
-        window.addEventListener('resize', forceFullScreen);
-        window.addEventListener('orientationchange', forceFullScreen);
-        window.addEventListener('pageshow', forceFullScreen);
-        forceFullScreen();
       }
 
       loadingBar.style.display = "block";

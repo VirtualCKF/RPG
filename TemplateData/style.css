@@ -1,6 +1,6 @@
-body { padding: 0; margin: 0; background: #FFFFFF; }
-#unity-container { position: fixed; width: 100%; height: 100%; left: 0; top: 0; }
-#unity-canvas { width: 100%; height: 100%; background: #FFFFFF; }
+body { padding: 0; margin: 0; background: #000000; } /* 改成黑色，或與你遊戲最上方的顏色一致 */
+#unity-container { position: fixed; width: 100%; height: 100%; left: 0; top: 0; background: transparent; }
+#unity-canvas { width: 100%; height: 100%; background: transparent; } /* 改為透明，防止 Canvas 白色背景遮擋 */
 
 /* =======================================================================
    ======================================================================= */
