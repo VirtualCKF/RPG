@@ -18,6 +18,19 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
+      /* �s�W�G�N��������v���b���ù��A���� iOS ���u�ʻP�����w���ϰ쳻�X���� */
+      html, body {
+        background-color: #231F20; /* �令�A�C���[���ɪ��I���� */
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+
       /* �л\ Unity �w�]�� mobile �˦��A�T�O�e���q�̳��� (0,0) �}�lø�s */
       #unity-container.unity-mobile {
         position: fixed !important;
@@ -25,11 +38,16 @@
         left: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        padding-top: 0 !important; /* ���� padding�A�� Canvas �����Ѫ�O */
-        padding-bottom: 0 !important; /* �j����������d�� */
+        /* ���� padding-top�A��� margin-top �÷f�t calc �p�� */
         margin: 0 !important;
+        margin-top: env(safe-area-inset-top) !important; 
+        
+        /* ����G�N���׸ɦ^�ӡA�`���ץ����O 100% �[�W�Q���U�Ӫ��������� */
+        height: calc(100% + env(safe-area-inset-top)) !important; 
+        padding-bottom: 0 !important;
       }
       
+      /* ����ץ��G�[�W !important �j���л\ Unity JS �ʺA���ͪ��e���p�� */
       #unity-canvas {
         width: 100% !important;
         height: 100% !important;
@@ -103,7 +121,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.366";
+      var unityVersion = "0.37";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -116,7 +134,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.366",
+        productVersion: "0.37",
         showBanner: unityShowBanner,
       };
 
