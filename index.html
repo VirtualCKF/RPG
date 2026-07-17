@@ -22,15 +22,15 @@
     <style>
 
       /* �j��N�����P Canvas �����Ժ���ù�����t�A�L������w����Z */
-      html, body, #unity-container, #unity-canvas {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        position: absolute !important;
+      html, body {
+        position: fixed !important;
         top: 0 !important;
         left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
         overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
       /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
@@ -100,7 +100,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.38";
+      var unityVersion = "0.381";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -113,7 +113,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.38",
+        productVersion: "0.381",
         showBanner: unityShowBanner,
       };
 
@@ -130,20 +130,32 @@
         container.className = "unity-mobile";
         loadingBar.style.position = "fixed";
 
-        // �j��Ԧ� Canvas �� iOS ���A�C�� JavaScript �ɤB
+        // �w�� PWA �Ҧ���������ù��ե�
         function forceFullScreen() {
-          var iosHeight = window.innerHeight;
-          canvas.style.height = iosHeight + "px";
-          container.style.height = iosHeight + "px";
+          // �ϥ� 100vh �� 100% �j��񺡡A���ϥΤ�í�w�� innerHeight
+          container.style.height = "100vh";
+          canvas.style.height = "100vh";
           
-          // �T�O�̳��ݶK��
-          canvas.style.top = "0px";
           container.style.top = "0px";
+          canvas.style.top = "0px";
+          container.style.bottom = "0px";
+          canvas.style.bottom = "0px";
+          
+          // �����O�ҡG���� 300 �@���A���ե��A���� iOS PWA ��V�����ᰪ���Y�^
+          setTimeout(function() {
+            var actualHeight = window.innerHeight;
+            if (document.documentElement.clientHeight > actualHeight) {
+              actualHeight = document.documentElement.clientHeight;
+            }
+            container.style.height = actualHeight + "px";
+            canvas.style.height = actualHeight + "px";
+          }, 300);
         }
         
-        // �i�J�����P�Y��ɳ��j�����@��
         window.addEventListener('resize', forceFullScreen);
         window.addEventListener('orientationchange', forceFullScreen);
+        // �w�� PWA �B�~��ť��ܪ��A�ܧ�
+        window.addEventListener('pageshow', forceFullScreen);
         forceFullScreen();
       }
 
