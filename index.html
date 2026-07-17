@@ -7,10 +7,13 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- iOS Web App ���ù��P���A�C�z���]�w -->
+    <!-- �i����jiOS Web App ���ù��]�w -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- �i����j���A�C�z���A���e�����̳ܳ��� -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
+    
+    <!-- �i�׷��u�ơj�j��]�w viewport ���� iOS �۰��Y�� UI -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
@@ -19,17 +22,17 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-      /* �j���мg Unity ��L��J�� */
+      /* �j���мg Unity ��L��J�ئ�m */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
         bottom: auto !important;
-        top: 45% !important;
+        top: 40% !important; /* �קK��L�B�� */
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
         width: 85% !important;
         max-width: 600px !important;
         z-index: 999999 !important;
-        font-size: 16px !important;
+        font-size: 16px !important; /* ���� iOS �I����J�خ��Y�񭶭� */
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
@@ -38,37 +41,32 @@
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
 
-      /* --- �i���P�����G�������������±��P�d�աj --- */
+      /* ��¦�G���]�w */
       html, body {
         margin: 0;
         padding: 0;
-        width: 100vw;
-        /* �ϥ� fill-available �� 100% �T�O���פ��Y�� */
+        width: 100%;
         height: 100%;
-        height: -webkit-fill-available; 
         overflow: hidden;
-        background-color: #000000; 
+        background-color: #000000; /* �]�m�P�C���I���ۦP���C�� */
+        position: fixed; /* ���������u�� */
       }
 
       #unity-container {
-        position: fixed !important; /* ��� fixed �w�쨾��u�ʻP���� */
-        top: 0;
-        left: 0;
-        width: 100vw !important;
-        /* �֤ߡG���ץ����j��Ԧ���ù��̩����A�å[�W�w���ϰ찪�� */
-        height: 100vh !important;
-        height: calc(100vh + env(safe-area-inset-bottom)) !important;
-        z-index: 1;
-      }
-
-      /* �j�� Canvas ����w��ö� Container */
-      #unity-canvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #unity-canvas {
         display: block;
+        width: 100%;
+        height: 100%;
+        /* �T�O Canvas ���|�W�X�e�� */
+        object-fit: fill; 
       }
 
       #unity-loading-bar {
@@ -81,7 +79,7 @@
     </style>
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop">
+    <div id="unity-container">
       <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -92,19 +90,14 @@
       <div id="unity-warning"> </div>
     </div>
     <script>
-      window.addEventListener("load", function () {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.register("ServiceWorker.js");
-        }
-      });
-
+      // --- �q�Ϊ�l�� ---
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var warningBanner = document.querySelector("#unity-warning");
 
-      var unityVersion = "0.3735";
+      var unityVersion = "0.37351";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       var config = {
@@ -114,43 +107,70 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.3735",
+        productVersion: "0.37351",
         showBanner: unityShowBanner,
       };
 
-      config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
+      // �]�m�A�����ѪR��
+      config.devicePixelRatio = Math.min(window.devicePixelRatio, 2); // �̰��䴩 Retina
 
-      // ����ݵ���]�w�P Canvas �j���
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        // �֤ߡG�����]�w�� interactive-widget=resizes-content ���������L�u�X�ɶ±��d��
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover, interactive-widget=resizes-content';
-        document.getElementsByTagName('head')[0].appendChild(meta);
+      // --- �i�֤߭ץ��j�ʺA���ù��P UI ��ҭץ� ---
+      function fixIOSFullscreenLayout() {
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          // 1. �j��] scroll ��m�A������}�C���îɯd��
+          window.scrollTo(0, 0);
+          
+          // 2. ���o�ù����z���� (window.screen.height �b Web App �Ҧ��U�q�`�O���T�����z����)
+          // �H�� Webview �� clientHeight
+          var screenH = window.screen.height;
+          var clientH = document.documentElement.clientHeight;
+          
+          // �p�G clientHeight �p�� screenH�A���ܩ������±� (�]�� Web App ���ù����׭p����~)
+          if (clientH < screenH) {
+            var heightToSet = screenH;
+            
+            // �w�� iPhone X �������A�ݭn�B�~�[�W�������w���ϰ찪�סA�T�O���L�±�
+            // �ڭ̰ʺA�p�� Body �P Document ���t�Ȩӻ��U�P�_
+            var bodyH = document.body.clientHeight;
+            if (bodyH > clientH) {
+                 heightToSet += (bodyH - clientH);
+            }
 
-        container.className = "unity-mobile";
-        
-        // �ѨM iOS ���� App �����p�⤣��Ǫ����D
-        function resizeCanvasToFill() {
-          // �ʺA��� window.screen.height�]���z�ù����ס^�ӫD window.innerHeight
-          // �o�˥i�H�T�O Canvas �Q�j��Ԧ��L Home Indicator �w���ϰ�A�����±�
-          var realHeight = Math.max(window.innerHeight, window.screen.height);
-          container.style.height = realHeight + "px";
-          canvas.style.height = realHeight + "px";
+            // ���έp��X������
+            container.style.height = heightToSet + "px";
+            canvas.style.height = heightToSet + "px";
+            
+            // �j��Ĳ�o Unity ���s�վ㤺�� canvas �j�p
+            if(window.unityInstance) {
+                window.unityInstance.SendMessage('GameManager', 'On���A''); // �o�O�d�ҡA��ڻݬݱz�� Unity �}���O�_�����T��
+                // �Y�L�S�����f�A�q�`���� CSS �� Unity �|�۰ʾA�t�A�Y�S���A�ݭn���Ĳ�o resize
+                window.dispatchEvent(new Event('resize'));
+            }
+          }
+          
+          // 3. �A���T�O viewport �]�w���T�A�����Y��
+          document.querySelector("meta[name=viewport]").content = 
+            "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
         }
+      }
 
-        // ��l����P�ƥ��ť
-        resizeCanvasToFill();
-        window.addEventListener('resize', resizeCanvasToFill);
-        window.addEventListener('orientationchange', resizeCanvasToFill);
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        container.className = "unity-mobile";
+        loadingBar.style.display = "block";
         
-        loadingBar.style.position = "fixed";
+        // ��ť�U�إi��ɭP�G���ܤƪ��ƥ�
+        window.addEventListener("load", fixIOSFullscreenLayout);
+        window.addEventListener("resize", fixIOSFullscreenLayout);
+        window.addEventListener("orientationchange", fixIOSFullscreenLayout);
+        // �������@���T�O DOM ������V
+        setTimeout(fixIOSFullscreenLayout, 500);
+        setTimeout(fixIOSFullscreenLayout, 1000);
+
       } else {
         canvas.style.width = "100%";
         canvas.style.height = "100%";
       }
 
-      loadingBar.style.display = "block";
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -176,7 +196,11 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
+          // �N��Ҧs�x�_�ӡA�H�K����ե�
+          window.unityInstance = unityInstance;
           loadingBar.remove();
+          // ��Ҥƫ�A���ץ��G��
+          fixIOSFullscreenLayout();
         }).catch((message) => {
           alert(message);
         });
