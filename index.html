@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- 1. ���ù� PWA �Ҧ��P�]�w���A�C���z�� -->
+    <!-- �ୱ���ù� PWA �Ҧ��P�]�w���A�C���z�� -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -18,32 +18,31 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-      /* �� html �P body ���I���ŦX�C����աA���A�C�z����I���~���|�S�� */
-      html, body {
-        background-color: #231F20; /* �o�̥i�אּ�A�C�����N���I����]�w�]�`�ǡ^ */
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+      /* �Q�� Safe Area �קK�C�������Q iOS �B���Y/�ʺA�q�P���A�C��r�B�� */
+      #unity-container {
+        padding-top: env(safe-area-inset-top);
+        box-sizing: border-box;
       }
-      
+
+      /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
-        bottom: auto !important;   
-        top: 50% !important;        
-        left: 50% !important; 
-        transform: translate(-50%, -50%) !important; 
+        bottom: auto !important;     /* �����쥻�K�b�������]�w */
+        top: 50% !important;         /* ����e�����W�q�]�׶}���������L�A40% �� 50% ��w���^ */
+        left: 50% !important;        /* ����e���������� */
+        transform: translate(-50%, -50%) !important; /* ��Ǹm����� */
         
-        width: 85% !important;       
+        /* �˦��P���Y���u�� */
+        width: 85% !important;       /* �e�צ��ù��� 85% */
         max-width: 600px !important; 
-        z-index: 999999 !important;  
-        font-size: 16px !important;  
+        z-index: 999999 !important;  /* �T�O����\�b Unity �e���̤W�h */
+        font-size: 16px !important;  /* ����GiOS �W�w�j�󵥩� 16px �I���~���|����Ӻ����e����M��j��j */
         
+        /* ��ı�L�ա]�i�ۥѽվ�^ */
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 2px solid #2196F3 !important; 
+        border: 2px solid #2196F3 !important; /* �����@���Ŧ���ءA�T�{���b�� */
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
@@ -92,7 +91,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.353";
+      var unityVersion = "0.352";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -105,11 +104,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-<<<<<<< HEAD
-        productVersion: "0.353",
-=======
-        productVersion: "0.351",
->>>>>>> a77d4c240cdf265d840eeb2ecae89f15e1f9c6b7
+        productVersion: "0.352",
         showBanner: unityShowBanner,
       };
 
