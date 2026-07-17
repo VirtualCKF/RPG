@@ -7,11 +7,9 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- �i�u�� 1�jiOS Web App �֤߳]�w�G�i�J���ù��Ҧ��A���éҦ��s����UI -->
+    <!-- iOS Web App ���ù��P���A�C�z���]�w -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- �i�u�� 2�j�]�w�������A�C�˦� (�z���A���e�����ܤU��) -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- ���� iOS �N�q�ܸ��X�ѧO���s�� -->
     <meta name="format-detection" content="telephone=no">
     
     <title>Unity WebGL Player | RPG</title>
@@ -21,11 +19,11 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-      /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
+      /* �j���мg Unity ��L��J�� */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
         bottom: auto !important;
-        top: 45% !important;  /* �L�աA�T�O��L�u�X�ɤ��|�צ� */
+        top: 45% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
         width: 85% !important;
@@ -40,36 +38,39 @@
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
 
-      /* --- �i�֤��u�ơG�ѨM�����d�աj --- */
-      /* 1. �]�w��¦�I���C�� (���P�C�� Loading �I����ۦP�A�קK�{�{�թ�) */
+      /* --- �i���P�����G�������������±��P�d�աj --- */
       html, body {
         margin: 0;
         padding: 0;
-        width: 100%;
+        width: 100vw;
+        /* �ϥ� fill-available �� 100% �T�O���פ��Y�� */
         height: 100%;
+        height: -webkit-fill-available; 
         overflow: hidden;
-        /* �N�I���]���¦�A����b���J���S�X�թ� */
         background-color: #000000; 
       }
 
-      /* 2. �j�� Unity �e���񺡾�ӿù� (�]�t�w���ϰ�) */
       #unity-container {
-        position: absolute;
+        position: fixed !important; /* ��� fixed �w�쨾��u�ʻP���� */
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%; /* �w�]���סA�b����ݷ|�Q Javascript �л\�� window.innerHeight */
+        width: 100vw !important;
+        /* �֤ߡG���ץ����j��Ԧ���ù��̩����A�å[�W�w���ϰ찪�� */
+        height: 100vh !important;
+        height: calc(100vh + env(safe-area-inset-bottom)) !important;
         z-index: 1;
       }
 
-      /* 3. �j�� Canvas �񺡮e�� */
+      /* �j�� Canvas ����w��ö� Container */
       #unity-canvas {
-        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100% !important;
         height: 100% !important;
+        display: block;
       }
 
-      /* 4. �u�� Loading Bar �˦��A�T�O�b���ù��U�m�� */
       #unity-loading-bar {
         position: absolute !important;
         z-index: 2;
@@ -77,12 +78,10 @@
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
       }
-      /* ----------------------------------------- */
     </style>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <!-- �`�N�G�o�̪� tabindex="-1" �O���F�� Canvas ����J�I�H������L��J -->
       <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -105,8 +104,7 @@
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var warningBanner = document.querySelector("#unity-warning");
 
-      // �۰���� Unity �������`�J URL �Ѽ�
-      var unityVersion = "0.3731";
+      var unityVersion = "0.3735";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       var config = {
@@ -116,40 +114,42 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.3731",
+        productVersion: "0.3735",
         showBanner: unityShowBanner,
       };
 
-      // ���������ѪR�״�V�A����L���d�y
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
-      // --- �i�֤��u�ơG����ݥ��ù��A�t�j ---
+      // ����ݵ���]�w�P Canvas �j���
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        
-        // (A) �]�w���㪺 Viewport (�]�t viewport-fit=cover)
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        // �֤ߡG�����]�w�� interactive-widget=resizes-content ���������L�u�X�ɶ±��d��
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover, interactive-widget=resizes-content';
         document.getElementsByTagName('head')[0].appendChild(meta);
 
-        // (B) �j�� Container �� fixed �w��A�T�O�b���ʺݤ��Q�s����UI����
         container.className = "unity-mobile";
-        container.style.position = "fixed";
-        container.style.width = "100%";
-        // �i����ק�j�j��׳]�� window.innerHeight �H���������ڰ��סA�������}�C����/��ܪ��ܤ�
-        container.style.height = window.innerHeight + "px"; 
+        
+        // �ѨM iOS ���� App �����p�⤣��Ǫ����D
+        function resizeCanvasToFill() {
+          // �ʺA��� window.screen.height�]���z�ù����ס^�ӫD window.innerHeight
+          // �o�˥i�H�T�O Canvas �Q�j��Ԧ��L Home Indicator �w���ϰ�A�����±�
+          var realHeight = Math.max(window.innerHeight, window.screen.height);
+          container.style.height = realHeight + "px";
+          canvas.style.height = realHeight + "px";
+        }
 
+        // ��l����P�ƥ��ť
+        resizeCanvasToFill();
+        window.addEventListener('resize', resizeCanvasToFill);
+        window.addEventListener('orientationchange', resizeCanvasToFill);
+        
         loadingBar.style.position = "fixed";
-
-        // �i�i���ޥ��j��ť�����ؤo�ܤơA���s�վ� Container ���ץH�A�� iOS ���� App �Ҧ��� UI �ܤ�
-        window.addEventListener('resize', function() {
-            container.style.height = window.innerHeight + "px";
-        });
       } else {
-        // Desktop style: let the game canvas fill the entire canvas of the page container:
         canvas.style.width = "100%";
         canvas.style.height = "100%";
       }
+
       loadingBar.style.display = "block";
 
       function unityShowBanner(msg, type) {
@@ -176,7 +176,6 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
-          // ���J������A�N Loading Bar �q DOM ����������
           loadingBar.remove();
         }).catch((message) => {
           alert(message);
