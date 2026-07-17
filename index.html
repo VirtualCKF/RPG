@@ -7,6 +7,10 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
+    <!-- 1. 全螢幕 PWA 模式與設定狀態列為透明 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -14,25 +18,32 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-      /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
+      /* 讓 html 與 body 的背景符合遊戲色調，狀態列透明後背景才不會露白 */
+      html, body {
+        background-color: #231F20; /* 這裡可改為你遊戲的代表背景色（預設深灰） */
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
-        bottom: auto !important;     /* �����쥻�K�b�������]�w */
-        top: 50% !important;         /* ����e�����W�q�]�׶}���������L�A40% �� 50% ��w���^ */
-        left: 50% !important;        /* ����e���������� */
-        transform: translate(-50%, -50%) !important; /* ��Ǹm����� */
+        bottom: auto !important;   
+        top: 50% !important;        
+        left: 50% !important; 
+        transform: translate(-50%, -50%) !important; 
         
-        /* �˦��P���Y���u�� */
-        width: 85% !important;       /* �e�צ��ù��� 85% */
+        width: 85% !important;       
         max-width: 600px !important; 
-        z-index: 999999 !important;  /* �T�O����\�b Unity �e���̤W�h */
-        font-size: 16px !important;  /* ����GiOS �W�w�j�󵥩� 16px �I���~���|����Ӻ����e����M��j��j */
+        z-index: 999999 !important;  
+        font-size: 16px !important;  
         
-        /* ��ı�L�ա]�i�ۥѽվ�^ */
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 2px solid #2196F3 !important; /* �����@���Ŧ���ءA�T�{���b�� */
+        border: 2px solid #2196F3 !important; 
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
