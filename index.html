@@ -24,7 +24,15 @@
         margin: 0;
         padding: 0;
         width: 100vw;
+        
+        /* ����ץ� 1�G�ѨM������� 100vh ����P�������䪺���D */
         height: 100vh;
+        height: -webkit-fill-available; 
+        
+        /* ����ץ� 2�G�j�������e�����񺡤���������w���ϰ�]�p iPhone ��������^ */
+        padding-bottom: env(safe-area-inset-bottom); 
+        box-sizing: border-box;
+
         overflow: hidden;
         position: fixed;
         top: 0;
@@ -38,13 +46,9 @@
         left: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        /* ���� padding-top�A��� margin-top �÷f�t calc �p�� */
+        padding-top: 0 !important; 
+        padding-bottom: 0 !important; 
         margin: 0 !important;
-        margin-top: env(safe-area-inset-top) !important; 
-        
-        /* ����G�N���׸ɦ^�ӡA�`���ץ����O 100% �[�W�Q���U�Ӫ��������� */
-        height: calc(100% + env(safe-area-inset-top)) !important; 
-        padding-bottom: 0 !important;
       }
       
       /* ����ץ��G�[�W !important �j���л\ Unity JS �ʺA���ͪ��e���p�� */
@@ -52,6 +56,10 @@
         width: 100% !important;
         height: 100% !important;
         display: block;
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
       }
 
       /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
@@ -121,7 +129,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.37";
+      var unityVersion = "0.371";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -134,7 +142,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.37",
+        productVersion: "0.371",
         showBanner: unityShowBanner,
       };
 
