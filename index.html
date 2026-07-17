@@ -7,10 +7,10 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- �ୱ���ù� PWA �Ҧ��P�]�w���A�C���z�� -->
+    <!-- �� iOS ����N�������� App �B��A�ñN�������A�C�]���z�� (���e�|�����ܪ��A�C�U��) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -18,50 +18,6 @@
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
     <style>
-      /* �s�W�G�N��������v���b���ù��A���� iOS ���u�ʻP�����w���ϰ쳻�X���� */
-      html, body {
-        background-color: #231F20; /* �令�A�C���[���ɪ��I���� */
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        
-        /* ����ץ� 1�G�ѨM������� 100vh ����P�������䪺���D */
-        height: 100vh;
-        height: -webkit-fill-available; 
-        
-        /* ����ץ� 2�G�j�������e�����񺡤���������w���ϰ�]�p iPhone ��������^ */
-        padding-bottom: env(safe-area-inset-bottom); 
-        box-sizing: border-box;
-
-        overflow: hidden;
-        position: fixed;
-        top: 0;
-        left: 0;
-      }
-
-      /* �л\ Unity �w�]�� mobile �˦��A�T�O�e���q�̳��� (0,0) �}�lø�s */
-      #unity-container.unity-mobile {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        padding-top: 0 !important; 
-        padding-bottom: 0 !important; 
-        margin: 0 !important;
-      }
-      
-      /* ����ץ��G�[�W !important �j���л\ Unity JS �ʺA���ͪ��e���p�� */
-      #unity-canvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-        position: absolute !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        left: 0 !important;
-      }
-
       /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
@@ -129,7 +85,7 @@
       }
 
       // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.371";
+      var unityVersion = "0.372";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -142,7 +98,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.371",
+        productVersion: "0.372",
         showBanner: unityShowBanner,
       };
 
@@ -154,11 +110,7 @@
         // Mobile device style: fill the whole browser client area with the game canvas:
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-
-        //meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        //document.getElementsByTagName('head')[0].appendChild(meta);
-
-        // �b viewport ���[�J viewport-fit=cover�A�o�O��������񺡪��A��w���ϰ쪺����
+        // �i�u�ơj�[�J viewport-fit=cover �j�����������e�����A��V�����̳����]�׶}�s���P���A�C��������D�^
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
