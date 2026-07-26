@@ -3,8 +3,8 @@
     "short_name": "RPG",
     "start_url": "index.html",
     "display": "fullscreen",
-    "background_color": "#FFFFFF",
-    "theme_color": "#fff",
+    "background_color": "#000000",
+    "theme_color": "#000",
     "description": "",
     "icons": [{
       "src": "TemplateData/icon200.png",
