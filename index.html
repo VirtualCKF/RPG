@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- iOS PWA 啟動與主題色彩設定 -->
+    <!-- iOS PWA 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
 
     <style>
-      /* 1. 徹底重置 body/html，解開 iOS 的安全區域鎖 */
+      /* 1. 清空根節點所有的自動 PWA Safe Area 邊距 */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -31,34 +31,35 @@
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
         background-color: #000000 !important;
       }
 
-      /* 2. 使用 inset: 0 強制容器撕開 safe-area 貼滿整個屏幕邊界 */
-      #unity-container, #unity-container.unity-mobile {
+      /* 2. 【關鍵絕殺】徹底覆寫 TemplateData/style.css 裡的 transform 置中與 margin */
+      #unity-container, 
+      #unity-container.unity-mobile {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        height: -webkit-fill-available !important; /* 修正 iOS Safari 視口高 */
+        /* 徹底抹除 Unity style.css 可能寫入的居中 Transform 與 Margin */
+        transform: none !important; 
         margin: 0 !important;
         padding: 0 !important;
       }
 
-      /* 3. 強制 Canvas 絕對定位滿版，不給 iOS 留縫隙 */
-      #unity-canvas {
-        position: absolute !important;
+      /* 3. 強制 Canvas 精準鎖定在螢幕絕對原點 (0, 0) */
+      #unity-canvas,
+      #unity-container.unity-mobile #unity-canvas {
+        position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #000000 !important;
-        display: block !important;
       }
 
       /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
@@ -123,7 +124,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.23";
+      var unityVersion = "0.26";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -134,7 +135,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.23",
+        productVersion: "0.26",
         showBanner: unityShowBanner,
       };
 
@@ -143,8 +144,7 @@
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        // 關鍵：明確鎖定視口，防推擠
-        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
         container.className = "unity-mobile";
@@ -153,21 +153,6 @@
 
       loadingBar.style.display = "block";
 
-      // --- 【iOS PWA 修正關鍵】強制校正視覺視口 ---
-      function adjustiOSViewport() {
-        if (!window.visualViewport) return;
-        // 抓取真實手機螢幕的尺寸
-        var realHeight = window.visualViewport.height;
-        var realWidth = window.visualViewport.width;
-        
-        // 確保 container 與 canvas 強制維持與視覺視口 100% 同步
-        container.style.height = window.innerHeight + "px";
-        canvas.style.height = "100%";
-        
-        // 滾動歸零，避免頂部 status bar 被推高
-        window.scrollTo(0, 0);
-      }
-
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
@@ -175,19 +160,6 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.remove(); 
-
-          // 啟用 Viewport 監控
-          if (window.visualViewport) {
-            window.visualViewport.addEventListener("resize", adjustiOSViewport);
-            window.visualViewport.addEventListener("scroll", adjustiOSViewport);
-          }
-          window.addEventListener("resize", adjustiOSViewport);
-          window.addEventListener("orientationchange", adjustiOSViewport);
-
-          // 遊戲載入完後延遲執行 twice 確保 Safari 渲染排程完成
-          setTimeout(adjustiOSViewport, 100);
-          setTimeout(adjustiOSViewport, 500);
-
         }).catch((message) => {
           alert(message);
         });
