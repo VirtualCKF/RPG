@@ -7,86 +7,79 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
+    <!-- 關鍵修改：viewport-fit=cover -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- iOS PWA 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-title" content="RPG">
 
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
-    <link rel="apple-touch-startup-image" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
-
     <style>
-      :root {
-        --sat: env(safe-area-inset-top);
-        --sab: env(safe-area-inset-bottom);
-      }
-
-      html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        overflow: hidden !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        background-color: #000000 !important;
-      }
-
-      #unity-container, #unity-container.unity-mobile {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        width: 100vw !important;
-
-        height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom)) !important;
-        margin: 0 !important;
-        padding: 0 !important;
-
-        margin-top: calc(-1 * env(safe-area-inset-top)) !important;
-      }
-
-
-      #unity-canvas {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: #000000 !important;
-        display: block !important;
-      }
-
+      /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
-        bottom: auto !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 85% !important;
-        max-width: 600px !important;
-        z-index: 999999 !important;
-        font-size: 16px !important;
+        bottom: auto !important;     /* 取消原本貼在底部的設定 */
+        top: 50% !important;         /* 移到畫面中上段（避開手機虛擬鍵盤，40% 比 50% 更安全） */
+        left: 50% !important;        /* 移到畫面水平中間 */
+        transform: translate(-50%, -50%) !important; /* 精準置中對齊 */
+        
+        /* 樣式與防縮放優化 */
+        width: 85% !important;       /* 寬度佔螢幕的 85% */
+        max-width: 600px !important; 
+        z-index: 999999 !important;  /* 確保絕對蓋在 Unity 畫布最上層 */
+        font-size: 16px !important;  /* 關鍵：iOS 規定大於等於 16px 點擊才不會讓整個網頁畫面突然放大放大 */
+        
+        /* 視覺微調（可自由調整） */
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 2px solid #2196F3 !important;
+        border: 2px solid #2196F3 !important; /* 給它一個藍色邊框，確認它在哪 */
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
+      }
+
+      /* 處理 iOS PWA 安全區域 */
+      #unity-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: -webkit-fill-available !important;
+        /* 使用 safe area insets 來補償瀏海/動態島 */
+        padding-top: env(safe-area-inset-top, 0px) !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        box-sizing: border-box !important;
+        background: #000000 !important;
+      }
+      
+      /* Unity canvas 填滿容器 */
+      #unity-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        background: #000000 !important;
+      }
+      
+      /* 針對 iOS 裝置的額外調整 */
+      @supports (padding: max(0px)) {
+        #unity-container {
+          padding-left: max(0px, env(safe-area-inset-left));
+          padding-right: max(0px, env(safe-area-inset-right));
+        }
       }
     </style>
   </head>
   <body>
     <div id="unity-container">
-      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="background: #000000 !important;"></canvas>
+      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -126,31 +119,48 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.12";
+      // --- 【防快取機制 2】自動獲取 Unity 的 Version 版本號並注入 URL 參數 ---
+      var unityVersion = "0.15";
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
+      // 自動在 Loader 的後方加上版號後綴（如 .js?v="0.2"）
+      var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       var config = {
+        // 自動在所有核心資源檔案後方加上 ?v=版號
         dataUrl: buildUrl + "/VirturalRPG_Online.data.unityweb?v=" + encodeURIComponent(unityVersion),
         frameworkUrl: buildUrl + "/VirturalRPG_Online.framework.js.unityweb?v=" + encodeURIComponent(unityVersion),
         codeUrl: buildUrl + "/VirturalRPG_Online.wasm.unityweb?v=" + encodeURIComponent(unityVersion),
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.12",
+        productVersion: "0.15",
         showBanner: unityShowBanner,
       };
 
+      // --- 【核心 WebGL Post-Processing 流暢度優化】 ---
+      // 限制高階手機（如 iPhone Retina 螢幕）超高解析度渲染，防止 GPU 過熱發燙，解決 10 秒後降頻卡頓
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
+        // 確保使用整個畫面
         container.className = "unity-mobile";
+        container.style.position = "fixed";
+        container.style.top = "0";
+        container.style.left = "0";
+        container.style.width = "100%";
+        container.style.height = "100%";
         loadingBar.style.position = "fixed";
+        
+        // 如果已經存在舊的 meta，移除它
+        var existingMeta = document.querySelector('meta[name="viewport"]');
+        if (existingMeta && existingMeta !== meta) {
+          existingMeta.parentNode.removeChild(existingMeta);
+        }
       }
 
       loadingBar.style.display = "block";
@@ -161,7 +171,11 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
+          // =======================================================================
+          // 【將原本的 loadingBar.style.display = "none"; 修改為以下這行】
+          // 載入完成後，直接把整個 Loading 畫面從網頁中「拔掉銷毀」，保證絕對消失、絕不卡畫面！
           loadingBar.remove(); 
+          // =======================================================================
         }).catch((message) => {
           alert(message);
         });
