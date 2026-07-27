@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
 
-    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
+    <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
@@ -33,25 +33,19 @@
       }
 
       #unity-container {
-        position: absolute !important;
+        position: fixed !important;
         top: 0 !important;
-        bottom: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100dvh !important;
         margin: 0 !important;
         padding: 0 !important;
       }
 
       #unity-canvas {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
         width: 100% !important;
         height: 100% !important;
         background: #000000 !important;
-        object-fit: fill !important;
       }
 
       input[type="text"], input[type="password"], textarea {
@@ -75,7 +69,7 @@
   </head>
   <body>
     <div id="unity-container">
-      <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1" style="background: #000000 !important;"></canvas>
+      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="background: #000000 !important;"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -115,14 +109,10 @@
         updateBannerVisibility();
       }
 
-<<<<<<< HEAD
-      var unityVersion = "0.21";
-=======
-           var unityVersion = "0.2";
->>>>>>> ee2f8ef35491560126b981606d44183a2d781178
+      var unityVersion = "0.23";
       var buildUrl = "Build";
-      
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
+      
       var config = {
         dataUrl: buildUrl + "/VirturalRPG_Online.data.unityweb?v=" + encodeURIComponent(unityVersion),
         frameworkUrl: buildUrl + "/VirturalRPG_Online.framework.js.unityweb?v=" + encodeURIComponent(unityVersion),
@@ -130,7 +120,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.21",
+        productVersion: "0.23",
         showBanner: unityShowBanner,
       };
 
@@ -146,22 +136,7 @@
         loadingBar.style.position = "fixed";
       }
 
-#if BACKGROUND_FILENAME
-      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
-#endif
       loadingBar.style.display = "block";
-
-      function forceFullscreenCanvas() {
-        if (canvas) {
-          canvas.style.removeProperty("width");
-          canvas.style.removeProperty("height");
-          canvas.style.width = "100%";
-          canvas.style.height = "100%";
-
-          canvas.width = window.innerWidth * window.devicePixelRatio;
-          canvas.height = window.innerHeight * window.devicePixelRatio;
-        }
-      }
 
       var script = document.createElement("script");
       script.src = loaderUrl;
@@ -170,11 +145,6 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.remove(); 
-
-          forceFullscreenCanvas();
-          window.addEventListener("resize", forceFullscreenCanvas);
-          window.addEventListener("orientationchange", forceFullscreenCanvas);
-
         }).catch((message) => {
           alert(message);
         });
