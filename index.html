@@ -6,76 +6,81 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    
+    <!-- iOS PWA 啟動與主題色彩設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport" content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#000000">
 
-    <title>Unity WebGL Player | RPG</title>
+    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
+    <link rel="apple-touch-startup-image" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
+
     <style>
-      /* �j���мg Unity �b����ݥͦ�����Ϳ�J�w���ئ�m */
+      /* 1. 全局深色底色與 100dvh 滿版鎖定 (防 iOS 橡皮筋回彈與閃白) */
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        background-color: #000000 !important;
+      }
+
+      /* 2. 強制 Unity 容器填滿畫面 */
+      #unity-container {
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* 3. 強制 Canvas 填滿，防止被 Unity 寫死的 px 尺寸擠壓 */
+      #unity-canvas {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: #000000 !important;
+        object-fit: fill !important;
+      }
+
+      /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
-        bottom: auto !important;     /* �����쥻�K�b�������]�w */
-        top: 50% !important;         /* ����e�����W�q�]�׶}���������L�A40% �� 50% ��w���^ */
-        left: 50% !important;        /* ����e���������� */
-        transform: translate(-50%, -50%) !important; /* ��Ǹm����� */
-        
-        /* �˦��P���Y���u�� */
-        width: 85% !important;       /* �e�צ��ù��� 85% */
-        max-width: 600px !important; 
-        z-index: 999999 !important;  /* �T�O����\�b Unity �e���̤W�h */
-        font-size: 16px !important;  /* ����GiOS �W�w�j�󵥩� 16px �I���~���|����Ӻ����e����M��j��j */
-        
-        /* ��ı�L�ա]�i�ۥѽվ�^ */
+        bottom: auto !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 85% !important;
+        max-width: 600px !important;
+        z-index: 999999 !important;
+        font-size: 16px !important;
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 2px solid #2196F3 !important; /* �����@���Ŧ���ءA�T�{���b�� */
+        border: 2px solid #2196F3 !important;
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
-      html, body {
-       margin: 0;
-      padding: 0;
-     width: 100vw;
-  height: 100vh;
-  /* 針對 iOS Safari 現代瀏覽器的動態視口高 */
-  height: -webkit-fill-available; 
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000;
-}
-
-      #unity-container {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-    #unity-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  /* 確保 Unity 的 Canvas 在 iOS 上不會因為 DPR 或 Resize 被拉伸偏移 */
-  display: block !important;
-}
     </style>
   </head>
   <body>
     <div id="unity-container">
-      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1" style="background: #000000 !important;"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -115,8 +120,7 @@
         updateBannerVisibility();
       }
 
-      // --- �i���֨����� 2�j�۰���� Unity �� Version �������ê`�J URL �Ѽ� ---
-      var unityVersion = "0.2";
+           var unityVersion = "0.2";
       var buildUrl = "Build";
       
       // �۰ʦb Loader �����[�W�������]�p .js?v="0.2"�^
@@ -133,38 +137,38 @@
         showBanner: unityShowBanner,
       };
 
-      // --- �i�֤� WebGL Post-Processing �y�Z���u�ơj ---
-      // ���������]�p iPhone Retina �ù��^�W���ѪR�״�V�A���� GPU �L���o�S�A�ѨM 10 ���᭰�W�d�y
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
-if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-  var meta = document.createElement('meta');
-  meta.name = 'viewport';
-  // 修正：不要限制 height=device-height，交給 CSS 的 100dvh 與 cover 處理
-  meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
-  document.getElementsByTagName('head')[0].appendChild(meta);
-  
-  container.className = "unity-mobile";
-  loadingBar.style.position = "fixed";
-}
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        // 關鍵：補上 viewport-fit=cover 允許渲染覆蓋頂部動態島/瀏海與底部 Safe Area
+        meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        
+        container.className = "unity-mobile";
+        loadingBar.style.position = "fixed";
+      }
 
-      function fixiOSViewport() {
-  var vh = window.innerHeight;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-  
-  // 強制重設 canvas 樣式高寬
-  if (canvas) {
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-  }
-}
-
-// 監聽螢幕旋轉與 Resize 事件
-window.addEventListener('resize', fixiOSViewport);
-window.addEventListener('orientationchange', fixiOSViewport);
-fixiOSViewport();
-      
+#if BACKGROUND_FILENAME
+      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+#endif
       loadingBar.style.display = "block";
+
+      // --- 【動態清除 Unity 硬寫入的 px 高度，防止 PWA 底部留黑】 ---
+      function forceFullscreenCanvas() {
+        if (canvas) {
+          // 清除 Unity 寫死的內聯 style
+          canvas.style.removeProperty("width");
+          canvas.style.removeProperty("height");
+          canvas.style.width = "100%";
+          canvas.style.height = "100%";
+
+          // 同步內部畫布解析度，避免畫面拉伸或比例偏差
+          canvas.width = window.innerWidth * window.devicePixelRatio;
+          canvas.height = window.innerHeight * window.devicePixelRatio;
+        }
+      }
 
       var script = document.createElement("script");
       script.src = loaderUrl;
@@ -172,11 +176,13 @@ fixiOSViewport();
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
-          // =======================================================================
-          // �i�N�쥻�� loadingBar.style.display = "none"; �קאּ�H�U�o��j
-          // ���J������A�������� Loading �e���q�������u�ޱ��P���v�A�O�ҵ�������B�����d�e���I
           loadingBar.remove(); 
-          // =======================================================================
+
+          // 載入完成後強制滿版並持續監控 Resize
+          forceFullscreenCanvas();
+          window.addEventListener("resize", forceFullscreenCanvas);
+          window.addEventListener("orientationchange", forceFullscreenCanvas);
+
         }).catch((message) => {
           alert(message);
         });
