@@ -9,7 +9,7 @@
     
     <!-- iOS PWA 設定：使用 black 防止 iOS 系統強制偏移 0,0 繪圖原點 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
 
     <title>Unity WebGL Player | RPG</title>
@@ -21,31 +21,32 @@
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
 
     <style>
-      /* 1. 鎖定根節點 */
+      /* 1. 全局重置 */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
         overflow: hidden !important;
+        position: fixed !important;
         background-color: #000000 !important;
       }
-
-      /* 2. 徹底清空 style.css 的固定高度，改用絕對填滿 */
+      
+      /* 2. 核心：抵消 iOS PWA 把 0,0 點往上推擠的 Bug */
       #unity-container, 
       #unity-container.unity-mobile {
-        position: absolute !important;
-        top: 0 !important;
+        position: fixed !important;
         left: 0 !important;
         right: 0 !important;
-        bottom: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        
+        /* 頂部強制對齊 0，把被推掉的 safe-area-inset-top 補回容器高度裡 */
+        top: 0 !important;
+        height: calc(100vh + env(safe-area-inset-top, 0px)) !important;
         margin: 0 !important;
         padding: 0 !important;
       }
-
-      /* 3. 強制 Canvas 精準貼合父容器 */
+      
       #unity-canvas,
       #unity-container.unity-mobile #unity-canvas {
         position: absolute !important;
@@ -54,6 +55,8 @@
         width: 100% !important;
         height: 100% !important;
         background: #000000 !important;
+        /* 讓 canvas 強制把 3D 畫面填滿拉伸到最底，不留縫隙 */
+        object-fit: cover !important; 
       }
 
       /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
@@ -118,7 +121,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.275";
+      var unityVersion = "0.278";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -129,7 +132,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.275",
+        productVersion: "0.278",
         showBanner: unityShowBanner,
       };
 
@@ -156,6 +159,10 @@
           loadingBar.remove(); 
         }).catch((message) => {
           alert(message);
+
+          // 強制把頁面滾動視口鎖在 (0,0)，防止 iOS 自動 Scroll 把 Canvas 推上去
+          window.scrollTo(0, 0);
+          document.body.scrollTop = 0;
         });
       };
       document.body.appendChild(script);
