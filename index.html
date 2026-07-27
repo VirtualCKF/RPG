@@ -20,32 +20,49 @@
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
 
     <style>
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sab: env(safe-area-inset-bottom);
+      }
+
       html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100vw !important;
-        height: 100dvh !important;
+        width: 100% !important;
+        height: 100% !important;
         overflow: hidden !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         background-color: #000000 !important;
       }
 
-      #unity-container {
-        position: fixed !important;
+      #unity-container, #unity-container.unity-mobile {
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         width: 100vw !important;
-        height: 100dvh !important;
+
+        height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom)) !important;
         margin: 0 !important;
         padding: 0 !important;
+
+        margin-top: calc(-1 * env(safe-area-inset-top)) !important;
       }
 
+
       #unity-canvas {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
         width: 100% !important;
         height: 100% !important;
         background: #000000 !important;
+        display: block !important;
       }
 
       input[type="text"], input[type="password"], textarea {
@@ -109,7 +126,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.23";
+      var unityVersion = "0.12";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -120,7 +137,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.23",
+        productVersion: "0.12",
         showBanner: unityShowBanner,
       };
 
