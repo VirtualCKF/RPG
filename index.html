@@ -7,74 +7,32 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- iOS PWA 滿版狀態列設定 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-
     <title>Unity WebGL Player | RPG</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="TemplateData/icon200.png">
-    <link rel="apple-touch-startup-image" href="TemplateData/icon200.png">
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
-
     <style>
-      /* 根容器設定：徹底解除 iOS 視口限制 */
-      html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        height: -webkit-fill-available !important;
-        overflow: hidden !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        background-color: #000000 !important;
-      }
-
-      /* 用 inset 0 強制容器四角貼緊實體螢幕邊界 */
-      #unity-container, 
-      #unity-container.unity-mobile {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      /* Canvas 強制貼滿父容器 */
-      #unity-canvas,
-      #unity-container.unity-mobile #unity-canvas {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: #000000 !important;
-      }
-
-      /* 覆寫 Unity 原生輸入預覽框位置 */
+      /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
       input[type="text"], input[type="password"], textarea {
         position: fixed !important;
-        bottom: auto !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 85% !important;
-        max-width: 600px !important;
-        z-index: 999999 !important;
-        font-size: 16px !important;
+        bottom: auto !important;     /* 取消原本貼在底部的設定 */
+        top: 50% !important;         /* 移到畫面中上段（避開手機虛擬鍵盤，40% 比 50% 更安全） */
+        left: 50% !important;        /* 移到畫面水平中間 */
+        transform: translate(-50%, -50%) !important; /* 精準置中對齊 */
+        
+        /* 樣式與防縮放優化 */
+        width: 85% !important;       /* 寬度佔螢幕的 85% */
+        max-width: 600px !important; 
+        z-index: 999999 !important;  /* 確保絕對蓋在 Unity 畫布最上層 */
+        font-size: 16px !important;  /* 關鍵：iOS 規定大於等於 16px 點擊才不會讓整個網頁畫面突然放大放大 */
+        
+        /* 視覺微調（可自由調整） */
         padding: 12px !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 2px solid #2196F3 !important;
+        border: 2px solid #2196F3 !important; /* 給它一個藍色邊框，確認它在哪 */
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
@@ -82,7 +40,7 @@
   </head>
   <body>
     <div id="unity-container">
-      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="background: #000000 !important;"></canvas>
+      <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -122,10 +80,10 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.25";
+      var unityVersion = "0.11";
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
+      var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       var config = {
         dataUrl: buildUrl + "/VirturalRPG_Online.data.unityweb?v=" + encodeURIComponent(unityVersion),
         frameworkUrl: buildUrl + "/VirturalRPG_Online.framework.js.unityweb?v=" + encodeURIComponent(unityVersion),
@@ -133,21 +91,22 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.25",
+        productVersion: "0.11",
         showBanner: unityShowBanner,
       };
 
-      // 限制 Retina 螢幕的最大倍率，防發燙與降頻
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
+        // =======================================================================
         container.className = "unity-mobile";
         loadingBar.style.position = "fixed";
+        // =======================================================================
       }
 
       loadingBar.style.display = "block";
@@ -159,8 +118,7 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.remove(); 
-          // 確保進入頁面時視口釘在 (0,0)
-          window.scrollTo(0, 0);
+          // =======================================================================
         }).catch((message) => {
           alert(message);
         });
