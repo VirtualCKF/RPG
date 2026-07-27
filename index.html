@@ -7,9 +7,9 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- iOS PWA 設定 -->
+    <!-- iOS PWA 設定：使用 black 防止 iOS 系統強制偏移 0,0 繪圖原點 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="theme-color" content="#000000">
 
     <title>Unity WebGL Player | RPG</title>
@@ -21,44 +21,38 @@
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
 
     <style>
-      /* 1. 清空根節點所有的自動 PWA Safe Area 邊距 */
+      /* 1. 鎖定根節點 */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
         width: 100% !important;
         height: 100% !important;
         overflow: hidden !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
         background-color: #000000 !important;
       }
 
-      /* 2. 【關鍵絕殺】徹底覆寫 TemplateData/style.css 裡的 transform 置中與 margin */
+      /* 2. 徹底清空 style.css 的固定高度，改用絕對填滿 */
       #unity-container, 
       #unity-container.unity-mobile {
-        position: fixed !important;
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        /* 徹底抹除 Unity style.css 可能寫入的居中 Transform 與 Margin */
-        transform: none !important; 
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
       }
 
-      /* 3. 強制 Canvas 精準鎖定在螢幕絕對原點 (0, 0) */
+      /* 3. 強制 Canvas 精準貼合父容器 */
       #unity-canvas,
       #unity-container.unity-mobile #unity-canvas {
-        position: fixed !important;
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        transform: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
         background: #000000 !important;
       }
 
@@ -124,7 +118,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.26";
+      var unityVersion = "0.275";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -135,7 +129,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.26",
+        productVersion: "0.275",
         showBanner: unityShowBanner,
       };
 
