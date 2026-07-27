@@ -25,28 +25,33 @@
       html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
+        width: 100% !important;
+        height: 100% !important;
+        height: -webkit-fill-available !important; /* 修正 iOS Safari PWA 視口高 */
         overflow: hidden !important;
         position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
         background-color: #000000 !important;
       }
       
-      /* 2. 核心：抵消 iOS PWA 把 0,0 點往上推擠的 Bug */
+      /* 2. 用 inset: 0 (top/bottom/left/right 均為 0) 強制扯開容器填滿實體螢幕 */
       #unity-container, 
       #unity-container.unity-mobile {
         position: fixed !important;
+        top: 0 !important;
         left: 0 !important;
         right: 0 !important;
+        bottom: 0 !important;
         width: 100vw !important;
-        
-        /* 頂部強制對齊 0，把被推掉的 safe-area-inset-top 補回容器高度裡 */
-        top: 0 !important;
-        height: calc(100vh + env(safe-area-inset-top, 0px)) !important;
+        height: 100% !important;
+        height: -webkit-fill-available !important;
         margin: 0 !important;
         padding: 0 !important;
+        z-index: 1 !important;
       }
       
+      /* 3. 強制 Canvas 滿版覆蓋，不留任何安全區遮罩 */
       #unity-canvas,
       #unity-container.unity-mobile #unity-canvas {
         position: absolute !important;
@@ -54,9 +59,9 @@
         left: 0 !important;
         width: 100% !important;
         height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #000000 !important;
-        /* 讓 canvas 強制把 3D 畫面填滿拉伸到最底，不留縫隙 */
-        object-fit: cover !important; 
       }
 
       /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
@@ -121,7 +126,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.278";
+      var unityVersion = "0.3";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -132,7 +137,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.278",
+        productVersion: "0.3",
         showBanner: unityShowBanner,
       };
 
@@ -157,12 +162,26 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.remove(); 
+          // =========================================================
+          // 【解決底部黑條遮擋 UI 的關鍵 JS】
+          // 強制觸發一次視口重新計算，讓 Unity 繪圖區吐滿整個實體螢幕
+          // =========================================================
+          function resizeForIOSPWA() {
+            window.scrollTo(0, 0);
+            if (window.visualViewport) {
+              container.style.height = window.screen.height + "px";
+            }
+          }
+        
+          resizeForIOSPWA();
+          setTimeout(resizeForIOSPWA, 200);
+          setTimeout(resizeForIOSPWA, 1000);
+        
+          window.addEventListener("resize", resizeForIOSPWA);
+          window.addEventListener("orientationchange", resizeForIOSPWA);
+        
         }).catch((message) => {
           alert(message);
-
-          // 強制把頁面滾動視口鎖在 (0,0)，防止 iOS 自動 Scroll 把 Canvas 推上去
-          window.scrollTo(0, 0);
-          document.body.scrollTop = 0;
         });
       };
       document.body.appendChild(script);
