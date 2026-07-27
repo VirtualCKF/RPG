@@ -39,19 +39,36 @@
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
-      body, html {
-       margin: 0;
-       padding: 0;
-       width: 100%;
-       height: 100%;
-       overflow: hidden;
-       position: fixed; /* Prevents bounce-scrolling which reveals Safari bars */
-       background-color: #000;
-      }
-     #unity-container, #unity-canvas {
-       width: 100% !important;
-       height: 100% !important;
-     }
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    /* 優先使用 dynamic viewport height，精準相容 iOS Safari 視口 */
+    height: 100dvh; 
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #000;
+}
+
+#unity-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#unity-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    /* 確保 Canvas 內容拉伸填滿，不留空隙 */
+    object-fit: cover; 
+}
     </style>
   </head>
   <body>
@@ -118,19 +135,16 @@
       // ���������]�p iPhone Retina �ù��^�W���ѪR�״�V�A���� GPU �L���o�S�A�ѨM 10 ���᭰�W�d�y
       config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        
-        // =======================================================================
-        // �i����ݮ֤߭ץ��j�j�����[���ئb����W�]�O���ù�����w��A����Q�������}�C��������
-        container.className = "unity-mobile";
-        loadingBar.style.position = "fixed";
-        // =======================================================================
-      }
+if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+  var meta = document.createElement('meta');
+  meta.name = 'viewport';
+  // 修正：不要限制 height=device-height，交給 CSS 的 100dvh 與 cover 處理
+  meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+  document.getElementsByTagName('head')[0].appendChild(meta);
+  
+  container.className = "unity-mobile";
+  loadingBar.style.position = "fixed";
+}
 
       loadingBar.style.display = "block";
 
