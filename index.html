@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- iOS PWA 設定：使用 black 防止 iOS 系統強制偏移 0,0 繪圖原點 -->
+    <!-- iOS PWA 啟動與主題色彩設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -21,37 +21,33 @@
     <link rel="icon" type="image/png" sizes="200x200" href="TemplateData/icon200.png">
 
     <style>
-      /* 1. 全局重置 */
+      /* 1. 根節點鎖定 */
       html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        height: -webkit-fill-available !important; /* 修正 iOS Safari PWA 視口高 */
+        width: 100vw !important;
+        height: 100vh !important;
         overflow: hidden !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         background-color: #000000 !important;
       }
-      
-      /* 2. 用 inset: 0 (top/bottom/left/right 均為 0) 強制扯開容器填滿實體螢幕 */
+
+      /* 2. 用 fixed + 0 鎖死容器，預設 100vw/100vh */
       #unity-container, 
       #unity-container.unity-mobile {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
         width: 100vw !important;
-        height: 100% !important;
-        height: -webkit-fill-available !important;
+        height: 100vh !important;
         margin: 0 !important;
         padding: 0 !important;
-        z-index: 1 !important;
+        transform: none !important;
       }
-      
-      /* 3. 強制 Canvas 滿版覆蓋，不留任何安全區遮罩 */
+
+      /* 3. Canvas 絕對貼合容器 */
       #unity-canvas,
       #unity-container.unity-mobile #unity-canvas {
         position: absolute !important;
@@ -62,6 +58,7 @@
         margin: 0 !important;
         padding: 0 !important;
         background: #000000 !important;
+        transform: none !important;
       }
 
       /* 強制覆寫 Unity 在手機端生成的原生輸入預覽框位置 */
@@ -126,7 +123,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.3";
+      var unityVersion = "0.2";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -137,7 +134,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.3",
+        productVersion: "0.2",
         showBanner: unityShowBanner,
       };
 
@@ -155,6 +152,24 @@
 
       loadingBar.style.display = "block";
 
+      // =======================================================================
+      // 【終極解決方案】：繞過 100vh 限制，直接用螢幕實體物理高度強制拉滿 Canvas
+      // =======================================================================
+      function forceRealScreenSize() {
+        // 抓取 iPhone 手機實體螢幕的像素高寬，徹底忽略 Safari 的 Safe Area 扣除
+        var screenH = window.screen.height;
+        var screenW = window.screen.width;
+
+        // 手動把容器與 Canvas 高度用 px 硬性寫死為「物理全螢幕高」
+        container.style.height = screenH + "px";
+        container.style.width = screenW + "px";
+        canvas.style.height = "100%";
+        canvas.style.width = "100%";
+
+        // 歸零捲動位置，防止 PWA 被向頂部推移
+        window.scrollTo(0, 0);
+      }
+
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
@@ -162,24 +177,17 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.remove(); 
-          // =========================================================
-          // 【解決底部黑條遮擋 UI 的關鍵 JS】
-          // 強制觸發一次視口重新計算，讓 Unity 繪圖區吐滿整個實體螢幕
-          // =========================================================
-          function resizeForIOSPWA() {
-            window.scrollTo(0, 0);
-            if (window.visualViewport) {
-              container.style.height = window.screen.height + "px";
-            }
-          }
-        
-          resizeForIOSPWA();
-          setTimeout(resizeForIOSPWA, 200);
-          setTimeout(resizeForIOSPWA, 1000);
-        
-          window.addEventListener("resize", resizeForIOSPWA);
-          window.addEventListener("orientationchange", resizeForIOSPWA);
-        
+
+          // 初始化與旋轉時皆強制調校
+          forceRealScreenSize();
+          window.addEventListener("resize", forceRealScreenSize);
+          window.addEventListener("orientationchange", forceRealScreenSize);
+          
+          // 針對 iOS PWA 初始化排程連打三次，確保 Safari 排版完成後強行覆寫
+          setTimeout(forceRealScreenSize, 100);
+          setTimeout(forceRealScreenSize, 500);
+          setTimeout(forceRealScreenSize, 1000);
+
         }).catch((message) => {
           alert(message);
         });
