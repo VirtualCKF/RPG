@@ -123,7 +123,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.2";
+      var unityVersion = "0.22";
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       
@@ -134,7 +134,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.2",
+        productVersion: "0.22",
         showBanner: unityShowBanner,
       };
 
@@ -178,16 +178,34 @@
         }).then((unityInstance) => {
           loadingBar.remove(); 
 
-          // 初始化與旋轉時皆強制調校
-          forceRealScreenSize();
-          window.addEventListener("resize", forceRealScreenSize);
-          window.addEventListener("orientationchange", forceRealScreenSize);
-          
-          // 針對 iOS PWA 初始化排程連打三次，確保 Safari 排版完成後強行覆寫
-          setTimeout(forceRealScreenSize, 100);
-          setTimeout(forceRealScreenSize, 500);
-          setTimeout(forceRealScreenSize, 1000);
-
+                function fixIOSPWAViewport() {
+            var screenH = window.screen.height;
+            var screenW = window.screen.width;
+            var dpr = Math.min(window.devicePixelRatio || 1, 1.4); // 沿用你原本設定的 max dpr
+        
+            // 1. 強制修正 CSS 外觀高寬
+            container.style.width = screenW + "px";
+            container.style.height = screenH + "px";
+            canvas.style.width = screenW + "px";
+            canvas.style.height = screenH + "px";
+        
+            // 2. 關鍵：強制同步更新 Canvas 的實體繪圖 Buffer 解析度
+            // 如果不改這個，Unity 的 3D 與 UI Canvas 渲染出來的像素高度會少一塊
+            canvas.width = screenW * dpr;
+            canvas.height = screenH * dpr;
+        
+            // 3. 鎖定視口滾動原點
+            window.scrollTo(0, 0);
+          }
+        
+          // 載入後立即執行，並在 200ms、500ms 重複強行調校（避開 iOS PWA 啟動時的動畫延遲）
+          fixIOSPWAViewport();
+          setTimeout(fixIOSPWAViewport, 200);
+          setTimeout(fixIOSPWAViewport, 500);
+        
+          window.addEventListener("resize", fixIOSPWAViewport);
+          window.addEventListener("orientationchange", fixIOSPWAViewport);
+        
         }).catch((message) => {
           alert(message);
         });
