@@ -80,7 +80,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.18";
+      var unityVersion = "0.21";
       var buildUrl = "Build";
       
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
@@ -91,11 +91,11 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.18",
+        productVersion: "0.21",
         showBanner: unityShowBanner,
       };
 
-      config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
+      //config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
