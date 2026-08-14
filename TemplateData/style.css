@@ -32,7 +32,7 @@ body { padding: 0; margin: 0; background: #FFFFFF; }
 /* LOGO 區塊：請根據你新圖的實際尺寸修改 width 與 height */
 #unity-logo { 
   width: 200px; 
-  height: 200px; 
+  height: 60px; 
   background: url('unity-logo-light.png') no-repeat center;
   background-size: contain;  
 }
@@ -40,9 +40,9 @@ body { padding: 0; margin: 0; background: #FFFFFF; }
 /* 進度條底條（還沒載入時的深綠色空條） */
 #unity-progress-bar-empty { 
   width: 200px;                    
-  height: 8px;                    
-  margin-top: 20px;          /* 只有上方留 20px 區隔 LOGO，不影響整體置中 */
-  background: #797979;             
+  height: 6px;                    
+  margin-top: 30px;          /* 只有上方留 20px 區隔 LOGO，不影響整體置中 */
+  background: #BABABA;             
   border-radius: 5px;              
   overflow: hidden;                
 }
@@ -52,7 +52,7 @@ body { padding: 0; margin: 0; background: #FFFFFF; }
   width: 0%; 
   height: 100%;                    
   margin-top: 0px;                 
-  background: #72B8FF;             
+  background: #222222;             
   border-radius: 5px;              
   transition: width 0.2s ease-out; 
 }
