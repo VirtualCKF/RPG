@@ -42,7 +42,7 @@ body { padding: 0; margin: 0; background: #000000; }
   width: 200px;                    
   height: 6px;                    
   margin-top: 30px;          /* 只有上方留 20px 區隔 LOGO，不影響整體置中 */
-  background: #BABABA;             
+  background: #4D4D4D;             
   border-radius: 5px;              
   overflow: hidden;                
 }
