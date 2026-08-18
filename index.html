@@ -54,10 +54,10 @@
       }
 
       .spinner {
-        width: 48px;
-        height: 48px;
-        border: 5px solid rgba(255, 255, 255, 0.15);
-        border-top: 5px solid #2196F3;
+        width: 32px; /* 寬度 */
+        height: 32px;  /* 高度 */
+        border: 3px solid rgba(255, 255, 255, 0.15);  /* 邊框粗細與背景 */
+        border-top: 3px solid #FFFFFF;             /* 上邊框粗細與顏色 */
         border-radius: 50%;
         animation: custom-spin 0.9s linear infinite;
       }
@@ -91,7 +91,7 @@
     <!-- 原生 Loading 轉圈層：在 JS 載入前第一時間呈現 -->
     <div id="custom-loader">
       <div class="spinner"></div>
-      <div class="loader-text">Loading...</div>
+      <div class="loader-text">即將進入...</div>
       <div class="loader-subtext">正在初始化引擎與環境</div>
     </div>
 
@@ -137,7 +137,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.18";
+      var unityVersion = "0.2";
       var buildUrl = "Build";
       
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
@@ -148,7 +148,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.18",
+        productVersion: "0.2",
         showBanner: unityShowBanner,
       };
 
