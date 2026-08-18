@@ -36,9 +36,65 @@
         border-radius: 8px !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
       }
+
+      /* ===== 原生 HTML/CSS Loading 轉圈遮罩 ===== */
+      #custom-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #151518;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+
+      .spinner {
+        width: 48px;
+        height: 48px;
+        border: 5px solid rgba(255, 255, 255, 0.15);
+        border-top: 5px solid #2196F3;
+        border-radius: 50%;
+        animation: custom-spin 0.9s linear infinite;
+      }
+
+      @keyframes custom-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loader-text {
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 16px;
+        margin-top: 20px;
+        letter-spacing: 0.5px;
+      }
+
+      .loader-subtext {
+        color: #8f8f8f;
+        font-size: 12px;
+        margin-top: 6px;
+      }
+
+      #custom-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
     </style>
   </head>
   <body>
+    <!-- 原生 Loading 轉圈層：在 JS 載入前第一時間呈現 -->
+    <div id="custom-loader">
+      <div class="spinner"></div>
+      <div class="loader-text">Loading...</div>
+      <div class="loader-subtext">正在初始化引擎與環境</div>
+    </div>
+
     <div id="unity-container">
       <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -61,6 +117,7 @@
       var loadingBar = document.querySelector("#unity-loading-bar");
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var warningBanner = document.querySelector("#unity-warning");
+      var customLoader = document.querySelector("#custom-loader");
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -80,7 +137,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.17";
+      var unityVersion = "0.18";
       var buildUrl = "Build";
       
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
@@ -91,7 +148,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "RPG",
-        productVersion: "0.17",
+        productVersion: "0.18",
         showBanner: unityShowBanner,
       };
 
@@ -116,8 +173,16 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
+
+          // 當 Unity 開始回報載入進度（> 5%）時，將原生轉圈遮罩淡出隱藏
+          if (progress > 0.05 && customLoader) {
+            customLoader.classList.add("hidden");
+          }
         }).then((unityInstance) => {
           loadingBar.remove(); 
+          if (customLoader) {
+            customLoader.classList.add("hidden");
+          }
           // =======================================================================
         }).catch((message) => {
           alert(message);
