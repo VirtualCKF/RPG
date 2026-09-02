@@ -106,6 +106,30 @@
       <div id="unity-warning"> </div>
     </div>
     <script>
+    // =======================================================================
+      // 1. 強制指定 WebGL 1.0 Context 攔截器 (iOS 防掉幀修復)
+      // =======================================================================
+      (function() {
+        var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isIOS) {
+          var originalGetContext = HTMLCanvasElement.prototype.getContext;
+          HTMLCanvasElement.prototype.getContext = function(type, attributes) {
+            if (type === 'webgl2' || type === 'experimental-webgl2') {
+              console.warn('[iOS WebKit Fix] 攔截 WebGL2，降級為 WebGL 1.0');
+              attributes = attributes || {};
+              attributes.antialias = false; // 關閉 WebGL 抗鋸齒降低 VRAM 負擔
+              
+              return originalGetContext.call(this, 'webgl', attributes) || 
+                     originalGetContext.call(this, 'experimental-webgl', attributes);
+            }
+            return originalGetContext.apply(this, arguments);
+          };
+        }
+      })();
+
+      // =======================================================================
+      // 2. 原有邏輯與初始化
+      // =======================================================================
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
