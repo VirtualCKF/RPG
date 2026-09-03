@@ -137,7 +137,7 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.25";
+      var unityVersion = "0.26";
       var buildUrl = "Build";
       
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
@@ -148,19 +148,19 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Failusion Studio",
         productName: "RPG",
-        productVersion: "0.25",
+        productVersion: "0.26",
         showBanner: unityShowBanner,
       };
 
       //config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
-        config.devicePixelRatio = Math.min(window.devicePixelRatio, 2); 
+        config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.9); 
 
         // =======================================================================
         container.className = "unity-mobile";
