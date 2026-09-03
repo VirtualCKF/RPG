@@ -137,18 +137,21 @@
         updateBannerVisibility();
       }
 
-      var unityVersion = "0.26";
+      // --- 【防快取機制 2】自動獲取 Unity 的 Version 版本號並注入 URL 參數 ---
+      var unityVersion = "0.28";
       var buildUrl = "Build";
       
+      // 自動在 Loader 的後方加上版號後綴（如 .js?v="0.2"）
       var loaderUrl = buildUrl + "/VirturalRPG_Online.loader.js?v=" + encodeURIComponent(unityVersion);
       var config = {
+        // 自動在所有核心資源檔案後方加上 ?v=版號
         dataUrl: buildUrl + "/VirturalRPG_Online.data.unityweb?v=" + encodeURIComponent(unityVersion),
         frameworkUrl: buildUrl + "/VirturalRPG_Online.framework.js.unityweb?v=" + encodeURIComponent(unityVersion),
         codeUrl: buildUrl + "/VirturalRPG_Online.wasm.unityweb?v=" + encodeURIComponent(unityVersion),
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Failusion Studio",
         productName: "RPG",
-        productVersion: "0.26",
+        productVersion: "0.28",
         showBanner: unityShowBanner,
       };
 
