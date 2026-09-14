@@ -85,6 +85,21 @@
         opacity: 0;
         visibility: hidden;
       }
+
+      /* ===== 新增：強制容量/進度顯示文字樣式 ===== */
+      .progress-text-style {
+        color: #FFFFFF !important;
+        font-size: 13px !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        margin-top: 15px !important;
+        text-align: center !important;
+        width: 100% !important;
+        position: relative !important;
+        z-index: 100000 !important;
+        display: block !important;
+        white-space: nowrap !important;
+        text-shadow: 0px 1px 3px rgba(0,0,0,0.8);
+      }
     </style>
   </head>
   <body>
@@ -92,7 +107,8 @@
     <div id="custom-loader">
       <div class="spinner"></div>
       <div class="loader-text">即將開始冒險...</div>
-      <div class="loader-subtext">正在初始化</div>
+      <!-- 轉圈遮罩上的進度文字 -->
+      <div id="custom-loader-progress" class="progress-text-style">準備載入...</div>
     </div>
 
     <div id="unity-container">
@@ -102,6 +118,8 @@
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
+        <!-- Unity 原生進度條內部的進度文字 -->
+        <div id="unity-progress-text" class="progress-text-style">準備載入...</div>
       </div>
       <div id="unity-warning"> </div>
     </div>
@@ -118,6 +136,16 @@
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var warningBanner = document.querySelector("#unity-warning");
       var customLoader = document.querySelector("#custom-loader");
+
+      // 進度文字 DOM 節點
+      var loaderProgress = document.querySelector("#custom-loader-progress");
+      var unityProgressText = document.querySelector("#unity-progress-text");
+
+      // 統一更新文字顯示的輔助函式
+      function updateProgressText(str) {
+        if (loaderProgress) loaderProgress.innerText = str;
+        if (unityProgressText) unityProgressText.innerText = str;
+      }
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -155,41 +183,79 @@
         showBanner: unityShowBanner,
       };
 
-      //config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.4); 
-
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
         
-        //config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.80); 
-
-        // =======================================================================
         container.className = "unity-mobile";
         loadingBar.style.position = "fixed";
-        // =======================================================================
       }
 
       loadingBar.style.display = "block";
 
+      // 方法二：動態透過 HTTP HEAD 請求獲取檔案總容量 (Bytes)
+      async function getTotalFileSize() {
+        var urls = [
+          config.dataUrl,
+          config.frameworkUrl,
+          config.codeUrl
+        ].filter(Boolean);
+
+        var totalBytes = 0;
+        
+        try {
+          // 使用 Promise.all 並行請求，提高獲取速度
+          await Promise.all(
+            urls.map(async function(url) {
+              try {
+                var response = await fetch(url, { method: 'HEAD' });
+                var size = response.headers.get('content-length');
+                if (size) {
+                  totalBytes += parseInt(size, 10);
+                }
+              } catch (e) {
+                // 若個別檔案被 CORS 或 HEAD 限制擋掉則靜默跳過
+              }
+            })
+          );
+        } catch (e) {}
+
+        return totalBytes;
+      }
+
       var script = document.createElement("script");
       script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
+      script.onload = async function() {
+        updateProgressText("正在計算容量...");
+        
+        // 獲取總容量
+        var totalBytes = await getTotalFileSize();
+        var totalMB = totalBytes > 0 ? (totalBytes / (1024 * 1024)).toFixed(2) : 0;
+
+        createUnityInstance(canvas, config, function(progress) {
           progressBarFull.style.width = 100 * progress + "%";
 
-          // 當 Unity 開始回報載入進度（> 5%）時，將原生轉圈遮罩淡出隱藏
-          if (progress > 0.05 && customLoader) {
+          // 計算並更新 MB 進度文字
+          if (totalBytes > 0) {
+            var loadedMB = ((progress * totalBytes) / (1024 * 1024)).toFixed(2);
+            updateProgressText(loadedMB + " MB / " + totalMB + " MB");
+          } else {
+            // 安全保底：若伺服器拒絕 HEAD 請求或未提供 Content-Length，回退顯示百分比
+            updateProgressText(Math.round(progress * 100) + "%");
+          }
+
+          // 進度到達 90% 以上時淡出原生的轉圈遮罩
+          if (progress > 0.9 && customLoader) {
             customLoader.classList.add("hidden");
           }
-        }).then((unityInstance) => {
+        }).then(function(unityInstance) {
           loadingBar.remove(); 
           if (customLoader) {
             customLoader.classList.add("hidden");
           }
-          // =======================================================================
-        }).catch((message) => {
+        }).catch(function(message) {
           alert(message);
         });
       };
