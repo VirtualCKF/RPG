@@ -133,7 +133,7 @@
       <!-- 保留轉圈元件 (CSS 已設定 display: none 隱藏) -->
       <div class="spinner"></div>
 
-      <div class="loader-text">即將開始冒險...</div>
+      <div class="loader-text">冒險即將開始...</div>
       
       <!-- 進度條 (Bar) -->
       <div class="loader-progress-bar-empty">
@@ -206,7 +206,7 @@
       }
 
       // --- 【防快取機制 2】自動獲取 Unity 的 Version 版本號並注入 URL 參數 ---
-      var unityVersion = "0.1233";
+      var unityVersion = "0.1234";
       var buildUrl = "Build";
       
       // 自動在 Loader 的後方加上版號後綴（如 .js?v="0.2"）
@@ -219,7 +219,7 @@
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Failusion Studio",
         productName: "RPG",
-        productVersion: "0.1233",
+        productVersion: "0.1234",
         showBanner: unityShowBanner,
       };
 
@@ -267,7 +267,7 @@
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = async function() {
-        updateProgressText("正在計算容量...");
+        updateProgressText("正在載入...");
         
         // 獲取總容量
         var totalBytes = await getTotalFileSize();
